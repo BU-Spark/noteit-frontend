@@ -10,6 +10,10 @@ class App extends Component {
         this.state ={};
     }
   login(email, password){
+    if (!(email || password)){
+      alert("Bloody Hell! Fill out a damn input box ")
+      return
+    }
     var options = {method: 'POST',
       dataType: "json",
       url: 'https://noteitbackend.herokuapp.com/api/v1/sessions',
@@ -22,7 +26,7 @@ class App extends Component {
       if (response.statusCode !== 201){
         this.setState({authenticated: false, error: body})
       } else {
-        this.setState({authenticated: true, email, token: body.token})
+        this.setState({authenticated: true, email, token: JSON.parse(body).token})
       }
     })
   }
@@ -34,8 +38,7 @@ class App extends Component {
     var options = {method: 'POST',
       dataType: "json",
       url: 'https://noteitbackend.herokuapp.com/api/v1/users',
-      qs:
-       { 'user[email]': email,
+      qs:{ 'user[email]': email,
          'user[password]': password,
          'user[firstname]': firstname,
          'user[lastname]': lastname },
@@ -51,17 +54,77 @@ class App extends Component {
 
   }
 
-  saveNote(note){
-    console.log(note)
-    this.setState({noteDisplay: <div/>})
+  saveNote(title, content){
+
+    var options = {method: 'POST',
+      dataType: "json",
+      url: 'https://noteitbackend.herokuapp.com/api/v1/notes',
+      headers: {Authorization: this.state.token, 'Content-Type': 'application/json'},
+      body:{title, content},
+      json: true
+    };
+      request(options, (err, response, body) => {
+        console.log(body)
+        this.setState({noteDisplay: <div/>})
+      })
+
   }
   displayNewNote(){
     this.setState({noteDisplay:
       <div>
-      <textarea rows="4" cols="50" onChange={(currentNote) => this.setState({currentNote: currentNote.target.value})}/> <br/>
-      <button onClick={() => this.saveNote(this.state.currentNote)}>Save Note</button>
+      <p> Title </p>
+      <input onChange={(title) => this.setState({currentTitle: title.target.value})}/>
+      <p> Body </p>
+      <textarea rows="4" cols="50" onChange={(currentNote) => this.setState({currentNote: currentNote.target.value})}/>
+      <br/>
+      <button onClick={() => this.saveNote(this.state.currentTitle, this.state.currentNote)}>Save Note</button>
       </div>
                 })
+  }
+  displayAllNotes(){
+    /**
+    const data = [
+        {
+            "id": 3,
+            "title": "TEST",
+            "content": "CONTENT TEST",
+            "user_id": 20,
+            "created_at": "2018-09-24T22:34:49.002Z",
+            "updated_at": "2018-09-24T22:34:49.002Z"
+        },
+        {
+            "id": 4,
+            "title": "TEST",
+            "content": "CONTENT TEST",
+            "user_id": 20,
+            "created_at": "2018-09-24T22:34:49.002Z",
+            "updated_at": "2018-09-24T22:34:49.002Z"
+        },
+    ]
+    data.map((anObjectMapped, index) => {
+      const allNotes = data.map(anObjectMapped => {
+            return (
+              <p key={anObjectMapped.id}>
+                  {anObjectMapped.title} - {anObjectMapped.content}
+              </p>
+            );
+        });
+        this.setState({allNotes});
+    })
+    **/
+
+    var options = { method: 'GET',
+      dataType: 'json',
+      url: 'https://noteitbackend.herokuapp.com/api/v1/notes',
+      headers: { Authorization: this.state.token } };
+
+    request(options, function (error, response, body) {
+      if (error) throw new Error(error);
+
+      console.log(body);
+    });
+    
+
   }
   render() {
     if (this.state.authenticated === false){
@@ -119,10 +182,8 @@ class App extends Component {
           </div>
           {this.state.noteDisplay}
           <ul>
-            <li>My Notes</li>
-              <ul>
-                <li>Note1</li>
-              </ul>
+            <a style={{color: 'blue', 'text-decoration': 'underline'}} onClick = {() => this.displayAllNotes()}><li>View All Notes</li></a>
+            {this.state.allNotes}
           </ul>
         </div>
       );
