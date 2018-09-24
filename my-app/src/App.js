@@ -9,29 +9,16 @@ class App extends Component {
         this.state ={};
     }
   createAccount(email, password, firstname, lastname){
-
-    // var config = {
-    //   headers: {'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, POST, PATCH, PUT, DELETE', 'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token'},
-    //   data: {'user[email]': email, 'user[password]': password, 'user[firstname]': firstname, 'user[lastname]': lastname}
-    // };
-    // axios.post('https://noteitbackend.herokuapp.com/api/v1/users', config).then(resp => {
-    //   console.log(resp)
-    //   this.setState({authenticated: true, email})
-    // }).catch(err => {
-    //   console.log(err)
-    //   this.setState({authenticated: false, error: "error"})
-    // })
     var request = require("request");
 var options = {method: 'POST',
-  url: 'https://noteitbackend.herokuapp.com/api/v1/sessions?origin=*&format=json',
+  dataType: "json",
+  url: 'https://noteitbackend.herokuapp.com/api/v1/users',
   qs:
-   { 'user[email]': 'testf1@bu.edu',
-     'user[password]': '12345678',
-     'user[firstname]': 'Test1',
-     'user[lastname]': 'Test1' },
-  headers:
-   { 'Postman-Token': 'a5806b1d-9985-4920-9692-1fa6fef6cdd1',
-     'Cache-Control': 'no-cache' }, };
+   { 'user[email]': this.state.email,
+     'user[password]': this.state.password,
+     'user[firstname]': this.state.firstname,
+     'user[lastname]': this.state.lastname },
+  };
 
 request(options, function (error, response, body) {
   if (error) throw new Error(error);
