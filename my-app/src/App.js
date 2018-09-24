@@ -2,32 +2,55 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import axios from 'axios';
+var request = require("request");
 
 class App extends Component {
   constructor(props) {
         super(props);
         this.state ={};
     }
+  login(email, password){
+    var options = {method: 'POST',
+      dataType: "json",
+      url: 'https://noteitbackend.herokuapp.com/api/v1/sessions',
+      qs:
+       { 'user[email]': email,
+         'user[password]': password,
+       },
+    };
+    request(options, (err, response, body) => {
+      if (response.statusCode !== 201){
+        this.setState({authenticated: false, error: body})
+      } else {
+        this.setState({authenticated: true, email, token: body.token})
+      }
+    })
+  }
   createAccount(email, password, firstname, lastname){
-    var request = require("request");
-var options = {method: 'POST',
-  dataType: "json",
-  url: 'https://noteitbackend.herokuapp.com/api/v1/users',
-  qs:
-   { 'user[email]': this.state.email,
-     'user[password]': this.state.password,
-     'user[firstname]': this.state.firstname,
-     'user[lastname]': this.state.lastname },
-  };
+    if (!(email || password || firstname || lastname)){
+      alert("Bloody Hell! Fill out a damn input box ")
+      return
+    }
+    var options = {method: 'POST',
+      dataType: "json",
+      url: 'https://noteitbackend.herokuapp.com/api/v1/users',
+      qs:
+       { 'user[email]': email,
+         'user[password]': password,
+         'user[firstname]': firstname,
+         'user[lastname]': lastname },
+      };
 
-request(options, function (error, response, body) {
-  if (error) throw new Error(error);
-
-  console.log(body);
-});
-
+    request(options, (err, response, body) => {
+      if (response.statusCode !== 201){
+        this.setState({authenticated: false, error: body})
+      } else {
+        this.login(email, password)
+      }
+    })
 
   }
+
   saveNote(note){
     console.log(note)
     this.setState({noteDisplay: <div/>})
@@ -68,7 +91,8 @@ request(options, function (error, response, body) {
                 <input onChange={(lastname) => this.setState({lastname: lastname.target.value})}/>
               </label>
               <br/>
-              <input type="submit" value="Submit" onClick={() => console.log("Submit")}/> or <button onClick={() => this.createAccount(this.state.email, this.state.password, this.state.firstname, this.state.lastname)}>Create Account</button>
+              <input type="submit" value="Submit" onClick={() => this.login(this.state.email, this.state.password)}/> or <button onClick={() => this.createAccount(this.state.email, this.state.password, this.state.firstname, this.state.lastname)}>Create Account</button>
+              <br/>
               {this.state.error}
         </div>
       );
@@ -129,7 +153,7 @@ request(options, function (error, response, body) {
               <input onChange={(lastname) => this.setState({lastname: lastname.target.value})}/>
             </label>
             <br/>
-            <input type="submit" value="Submit" onClick={() => console.log("Submit")}/> or <button onClick={() => this.createAccount(this.state.email, this.state.password, this.state.firstname, this.state.lastname)}>Create Account</button>
+            <input type="submit" value="Submit" onClick={() => this.login(this.state.email, this.state.password)}/>  or <button onClick={() => this.createAccount(this.state.email, this.state.password, this.state.firstname, this.state.lastname)}>Create Account</button>
       </div>
     );
   }
