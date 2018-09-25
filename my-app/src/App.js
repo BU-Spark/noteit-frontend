@@ -9,13 +9,15 @@ class App extends Component {
         super(props);
         this.state ={};
     }
+
+   
   login(email, password){
     if (!(email || password)){
       alert("Bloody Hell! Fill out a damn input box ")
       return
     }
     var options = {method: 'POST',
-      dataType: "json",
+      dataType: "jsonp",
       url: 'https://noteitbackend.herokuapp.com/api/v1/sessions',
       qs:
        { 'user[email]': email,
@@ -30,13 +32,15 @@ class App extends Component {
       }
     })
   }
+
   createAccount(email, password, firstname, lastname){
+    
     if (!(email || password || firstname || lastname)){
       alert("Bloody Hell! Fill out a damn input box ")
       return
     }
     var options = {method: 'POST',
-      dataType: "json",
+      dataType: "jsonp",
       url: 'https://noteitbackend.herokuapp.com/api/v1/users',
       qs:{ 'user[email]': email,
          'user[password]': password,
@@ -57,7 +61,7 @@ class App extends Component {
   saveNote(title, content){
 
     var options = {method: 'POST',
-      dataType: "json",
+      dataType: "jsonp",
       url: 'https://noteitbackend.herokuapp.com/api/v1/notes',
       headers: {Authorization: this.state.token, 'Content-Type': 'application/json'},
       body:{title, content},
@@ -114,9 +118,9 @@ class App extends Component {
     **/
 
     var options = { method: 'GET',
-      dataType: 'json',
+      dataType: 'jsonp',
       url: 'https://noteitbackend.herokuapp.com/api/v1/notes',
-      headers: { Authorization: this.state.token } };
+      headers: { Authorization: this.state.token, 'Content-Type': 'application/json' } };
 
     request(options, function (error, response, body) {
       if (error) throw new Error(error);

@@ -1,0 +1,1 @@
+curl -H 'Content-type: application/jsonp' -H 'Authorization: SWZgqcj18lreeiIkynuzhR0gRQ3OQlqIFgWYj144eGT0t1tDhu7zH1669wn3r9Ip1AZevLTAIr3J0H8ekgCBUg==' https://noteitbackend.herokuapp.com/api/v1/notes
