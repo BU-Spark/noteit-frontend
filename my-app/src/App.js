@@ -10,7 +10,7 @@ class App extends Component {
         this.state ={};
     }
 
-   
+
   login(email, password){
     if (!(email || password)){
       alert("Bloody Hell! Fill out a damn input box ")
@@ -34,7 +34,7 @@ class App extends Component {
   }
 
   createAccount(email, password, firstname, lastname){
-    
+
     if (!(email || password || firstname || lastname)){
       alert("Bloody Hell! Fill out a damn input box ")
       return
@@ -68,66 +68,52 @@ class App extends Component {
       json: true
     };
       request(options, (err, response, body) => {
-        console.log(body)
         this.setState({noteDisplay: <div/>})
       })
 
   }
   displayNewNote(){
-    this.setState({noteDisplay:
-      <div>
-      <p> Title </p>
-      <input onChange={(title) => this.setState({currentTitle: title.target.value})}/>
-      <p> Body </p>
-      <textarea rows="4" cols="50" onChange={(currentNote) => this.setState({currentNote: currentNote.target.value})}/>
-      <br/>
-      <button onClick={() => this.saveNote(this.state.currentTitle, this.state.currentNote)}>Save Note</button>
-      </div>
-                })
+    if (this.state.noteDisplay){
+      this.setState({noteDisplay: false});
+    } else {
+      this.setState({noteDisplay:
+        <div>
+        <p> Title </p>
+        <input onChange={(title) => this.setState({currentTitle: title.target.value})}/>
+        <p> Body </p>
+        <textarea rows="4" cols="50" onChange={(currentNote) => this.setState({currentNote: currentNote.target.value})}/>
+        <br/>
+        <button onClick={() => this.saveNote(this.state.currentTitle, this.state.currentNote)}>Save Note</button>
+        </div>
+      })
+    }
+
   }
   displayAllNotes(){
-    /**
-    const data = [
-        {
-            "id": 3,
-            "title": "TEST",
-            "content": "CONTENT TEST",
-            "user_id": 20,
-            "created_at": "2018-09-24T22:34:49.002Z",
-            "updated_at": "2018-09-24T22:34:49.002Z"
-        },
-        {
-            "id": 4,
-            "title": "TEST",
-            "content": "CONTENT TEST",
-            "user_id": 20,
-            "created_at": "2018-09-24T22:34:49.002Z",
-            "updated_at": "2018-09-24T22:34:49.002Z"
-        },
-    ]
-    data.map((anObjectMapped, index) => {
-      const allNotes = data.map(anObjectMapped => {
-            return (
-              <p key={anObjectMapped.id}>
-                  {anObjectMapped.title} - {anObjectMapped.content}
-              </p>
-            );
-        });
-        this.setState({allNotes});
-    })
-    **/
+    if (this.state.allNotes){
+      this.setState({allNotes: false});
+    } else {
+      var options = { method: 'GET',
+        dataType: 'jsonp',
+        url: 'https://noteitbackend.herokuapp.com/api/v1/notes',
+        headers: { Authorization: this.state.token, 'Content-Type': 'application/json' } };
 
-    var options = { method: 'GET',
-      dataType: 'jsonp',
-      url: 'https://noteitbackend.herokuapp.com/api/v1/notes',
-      headers: { Authorization: this.state.token, 'Content-Type': 'application/json' } };
+      request(options, (err, response, body) => {
+        if (err) throw new Error(err);
+        body = (JSON.parse(body))
+        const allNotes = body.map(anObjectMapped => {
+              return (
+                <p key={anObjectMapped.id}>
+                    {anObjectMapped.title} - {anObjectMapped.content}
+                </p>
+              );
+          });
+          this.setState({allNotes});
 
-    request(options, function (error, response, body) {
-      if (error) throw new Error(error);
+      });
+    }
 
-      console.log(body);
-    });
-    
+
 
   }
   render() {
